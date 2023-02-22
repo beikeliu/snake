@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>snake</title>
+  <style>
+    body,
+    #app {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <canvas id="snake"></canvas>
+    <button id="next">next</button>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
