@@ -3,15 +3,17 @@ enum Color {
   beanColor = "#faad14",
   bodyColor = "#262626",
 }
-
+type NextPath = "ArrowUp" | "ArrowDown" | "ArrowLeft" | "ArrowRight";
 export default class Snake {
   boxW: number;
   boxH: number;
   spacing: number;
   snakeEl: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
-  bean?: { x: number; y: number };
-  body?: { x: number; y: number }[];
+  bean!: { x: number; y: number };
+  body!: { x: number; y: number }[];
+  nextPath: NextPath;
+  timer: number;
   /**
    * 构造函数
    * @param domQuery Canvas DOM查询器
@@ -35,7 +37,8 @@ export default class Snake {
     this.initBody();
     this.render();
     this.initEventListener();
-    this.run();
+    this.nextPath = "ArrowRight";
+    this.timer = this.run();
   }
   setCanvasStyle() {
     this.snakeEl.width = this.boxW;
@@ -63,7 +66,7 @@ export default class Snake {
   createBean() {
     this.ctx.beginPath();
     this.ctx.fillStyle = Color.beanColor;
-    const { x, y } = this.bean!;
+    const { x, y } = this.bean;
     this.ctx.arc(x, y, 10, 0, 2 * Math.PI);
     this.ctx.fill();
     this.ctx.closePath();
@@ -81,13 +84,13 @@ export default class Snake {
   }
   createBody() {
     this.ctx.fillStyle = Color.bodyColor;
-    for (let n = 0; n < this.body!.length; n++) {
-      if (n === this.body!.length - 1) {
+    for (let n = 0; n < this.body.length; n++) {
+      if (n === this.body.length - 1) {
         this.ctx.fillStyle = "#0000FF";
       }
       this.ctx.beginPath();
-      const x = (this.body![n].x - 1) * this.spacing;
-      const y = (this.body![n].y - 1) * this.spacing;
+      const x = (this.body[n].x - 1) * this.spacing;
+      const y = (this.body[n].y - 1) * this.spacing;
       const w = this.spacing;
       const h = this.spacing;
       this.ctx.fillRect(x, y, w, h);
@@ -96,9 +99,30 @@ export default class Snake {
     }
   }
   nextBody() {
-    this.body!.forEach((item) => {
-      item.x++;
-    });
+    switch (this.nextPath) {
+      case "ArrowRight":
+        for (let n = 0; n < this.body.length; n++) {
+          this.body[n].x++;
+        }
+        break;
+      case "ArrowDown":
+        for (let n = 0; n < this.body.length; n++) {
+          this.body[n].y++;
+        }
+        break;
+      case "ArrowLeft":
+        for (let n = 0; n < this.body.length; n++) {
+          this.body[n].x--;
+        }
+        break;
+      case "ArrowUp":
+        for (let n = 0; n < this.body.length; n++) {
+          this.body[n].y--;
+        }
+        break;
+    }
+    const debug = document.querySelector("#debug")!;
+    debug.innerHTML = JSON.stringify(this.body);
   }
   clear() {
     const { width, height } = this.snakeEl;
@@ -123,18 +147,18 @@ export default class Snake {
   }
   initEventListener() {
     document.addEventListener("keyup", ({ code }) => {
-      if (["ArrowUp", "ArrowLeft", "ArrowRight", "ArrowDown"].includes(code)) {
-        this.changeDirection(code);
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(code)) {
+        this.nextPath = code as NextPath;
       }
     });
   }
-  changeDirection(dire: string) {
-    console.log(dire);
-  }
   run() {
-    setInterval(() => {
+    return setInterval(() => {
       this.nextBody();
       this.render();
-    }, 500)
+    }, 500);
+  }
+  over() {
+    clearInterval(this.timer);
   }
 }
